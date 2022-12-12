@@ -40,5 +40,7 @@ in {
       isSystemUser = true;
     };
     users.groups.xkomhotshot = {};
+
+    systemd.tmpfiles.rules = ["d /var/lib/xkomhotshot 0700 xkomhotshot root - -"];
   };
 }

@@ -2,7 +2,7 @@
 import requests
 from telegram import Bot, Chat, ParseMode
 
-with open('/var/xkom/settings.txt', 'r') as file:
+with open('/var/lib/xkomhotshot/settings.txt', 'r') as file:
     file = file.readlines()
     token = file[0].rstrip()
     channel = file[1].rstrip()
