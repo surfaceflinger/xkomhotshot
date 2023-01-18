@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
+import asyncio
 import requests
-from telegram import Bot, Chat, ParseMode
+from telegram import Bot, Chat
+from telegram.constants import ParseMode
 
 with open('/var/lib/xkomhotshot/settings.txt', 'r') as file:
     file = file.readlines()
@@ -18,14 +20,14 @@ def getHotShot():
     r = requests.get(url=apiurl, headers=apiheaders).json()
     return([r['PromotionName'], r['Price'], r['OldPrice'], "https://www.x-kom.pl/goracy_strzal/"+r['Id'], r['Product']['MainPhoto']['Url']])
 
-def main():
+async def main():
     bot = Bot(token)
     epic = getHotShot()
     description = "Item: {}\nCena: {}PLN\nStara cena: {}PLN\nLink: {}".format(epic[0], epic[1], epic[2], epic[3])
     try:
-        bot.send_photo(chat_id=channel, photo=epic[4], caption=description)
+       await bot.send_photo(chat_id=channel, photo=epic[4], caption=description)
     except:
-        bot.send_message(chat_id=channel, text=description)
+       await bot.send_message(chat_id=channel, text=description)
 
 if __name__ == '__main__':
-    main()
+   asyncio.run(main())
