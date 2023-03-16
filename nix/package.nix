@@ -1,6 +1,6 @@
 {
   pkgs,
-  pythonPkgs ? pkgs.python310Packages,
+  pythonPkgs ? pkgs.python311Packages,
   ...
 }: let
   package = {
