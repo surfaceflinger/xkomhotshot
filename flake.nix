@@ -30,5 +30,9 @@
       });
 
       nixosModules.default = import ./nix/service.nix { overlay = self.overlays.default; };
+
+      devshell = forAllSystems (system: {
+        buildInputs = [ self.packages.${system}.default ];
+      });
     };
 }
