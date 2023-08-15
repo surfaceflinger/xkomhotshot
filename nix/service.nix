@@ -1,22 +1,32 @@
+{ overlay }:
+{ config
+, lib
+, pkgs
+, outputs
+, ...
+}:
+with lib;
+
+let
+  cfg = config.services.xkomhotshot;
+in
+
 {
-  config,
-  lib,
-  pkgs,
-  ...
-}: let
-  xkomhotshot = pkgs.callPackage ./package.nix {
-    inherit pkgs;
+  # Interface
+  options.services.xkomhotshot.enable = mkOption {
+    type = types.bool;
+    default = false;
   };
 
-  cfg = config.services.xkomhotshot;
-in {
-  options.services.xkomhotshot.enable = lib.mkEnableOption "xkomhotshot";
+  # Implementation
+  config = mkIf cfg.enable {
 
-  config = lib.mkIf cfg.enable {
+    nixpkgs.overlays = [ overlay ];
+
     systemd.timers.xkomhotshot = {
-      wantedBy = ["timers.target"];
-      partOf = ["xkomhotshot.service"];
-      timerConfig.OnCalendar = ["*-*-* 10:00:05 Europe/Warsaw" "*-*-* 22:00:05 Europe/Warsaw"];
+      wantedBy = [ "timers.target" ];
+      partOf = [ "xkomhotshot.service" ];
+      timerConfig.OnCalendar = [ "*-*-* 10:00:05 Europe/Warsaw" "*-*-* 22:00:05 Europe/Warsaw" ];
     };
 
     systemd.services.xkomhotshot = {
@@ -29,7 +39,7 @@ in {
         RestrictAddressFamilies = "AF_INET AF_INET6";
         LockPersonality = "true";
         RestrictRealtime = "true";
-        ExecStart = "${xkomhotshot}/bin/main.py";
+        ExecStart = "${pkgs.python3Packages.xkomhotshot}/bin/main.py";
         User = "xkomhotshot";
         Group = "xkomhotshot";
       };
@@ -39,8 +49,8 @@ in {
       group = "xkomhotshot";
       isSystemUser = true;
     };
-    users.groups.xkomhotshot = {};
+    users.groups.xkomhotshot = { };
 
-    systemd.tmpfiles.rules = ["d /var/lib/xkomhotshot 0700 xkomhotshot root - -"];
+    systemd.tmpfiles.rules = [ "d /var/lib/xkomhotshot 0700 xkomhotshot root - -" ];
   };
 }
