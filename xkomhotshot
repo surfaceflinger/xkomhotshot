@@ -2,7 +2,6 @@
 import asyncio
 import requests
 from telegram import Bot
-from telegram.constants import ParseMode
 
 # Load API credentials from the settings file
 with open('/var/lib/xkomhotshot/settings.txt', 'r') as file:
@@ -38,7 +37,7 @@ async def main():
         f"Link: {hot_shot_data['link']}"
     )
     try:
-        await bot.send_photo(chat_id=channel, photo=hot_shot_data['photo_url'], caption=description, parse_mode=ParseMode.MARKDOWN)
+        await bot.send_photo(chat_id=channel, photo=hot_shot_data['photo_url'], caption=description)
     except Exception as e:
         await bot.send_message(chat_id=channel, text=description)
 

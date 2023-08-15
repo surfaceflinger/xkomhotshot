@@ -39,7 +39,7 @@ in
         RestrictAddressFamilies = "AF_INET AF_INET6";
         LockPersonality = "true";
         RestrictRealtime = "true";
-        ExecStart = "${pkgs.python3Packages.xkomhotshot}/bin/main.py";
+        ExecStart = "${pkgs.python3Packages.xkomhotshot}/bin/xkomhotshot";
         User = "xkomhotshot";
         Group = "xkomhotshot";
       };
