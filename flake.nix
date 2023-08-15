@@ -6,7 +6,8 @@
   outputs = { self, nixpkgs }:
     let
       supportedSystems = [ "x86_64-linux" "i686-linux" "aarch64-linux" ];
-      forAllSystems = f: nixpkgs.lib.genAttrs supportedSystems (system: f system);
+      forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
+      nixpkgsFor = forAllSystems (system: import nixpkgs { inherit system; overlays = [ self.overlays.default ]; });
     in
     {
       overlays.default = final: prev: rec {
@@ -19,20 +20,19 @@
       };
 
       packages = forAllSystems (system: {
-        default = (import nixpkgs {
-          inherit system;
-          overlays = [ self.overlays.default ];
-        }).python3Packages.xkomhotshot;
+        inherit (nixpkgsFor.${system}.python3Packages) xkomhotshot;
       });
 
       checks = forAllSystems (system: {
-        build = self.packages.${system}.default;
+        build = self.packages.${system}.xkomhotshot;
       });
 
       nixosModules.default = import ./nix/service.nix { overlay = self.overlays.default; };
 
-      devshell = forAllSystems (system: {
-        buildInputs = [ self.packages.${system}.default ];
+      devShells = forAllSystems (system: {
+        default = nixpkgsFor.${system}.mkShell {
+          buildInputs = with nixpkgsFor.${system}.pkgs ; [ python3Packages.xkomhotshot ];
+        };
       });
     };
 }
