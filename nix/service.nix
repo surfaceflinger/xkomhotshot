@@ -1,9 +1,10 @@
-{ overlay }:
+{ self, ... }:
 { config
 , lib
 , pkgs
 , ...
 }:
+
 with lib;
 
 let
@@ -12,15 +13,17 @@ in
 
 {
   # Interface
-  options.services.xkomhotshot.enable = mkOption {
-    type = types.bool;
-    default = false;
+  options.services.xkomhotshot = {
+    enable = mkEnableOption (mdDoc "xkomhotshot");
+    environmentFile = mkOption {
+      type = types.path;
+      default = null;
+      example = "/run/secrets/xkomhotshot.env";
+    };
   };
 
   # Implementation
   config = mkIf cfg.enable {
-
-    nixpkgs.overlays = [ overlay ];
 
     systemd.timers.xkomhotshot = {
       wantedBy = [ "timers.target" ];
@@ -38,18 +41,10 @@ in
         RestrictAddressFamilies = "AF_INET AF_INET6";
         LockPersonality = "true";
         RestrictRealtime = "true";
-        ExecStart = "${pkgs.python3Packages.xkomhotshot}/bin/xkomhotshot";
-        User = "xkomhotshot";
-        Group = "xkomhotshot";
+        DynamicUser = true;
+        EnvironmentFile = cfg.environmentFile;
+        ExecStart = "${self.packages.${pkgs.system}.default}/bin/xkomhotshot";
       };
     };
-
-    users.users.xkomhotshot = {
-      group = "xkomhotshot";
-      isSystemUser = true;
-    };
-    users.groups.xkomhotshot = { };
-
-    systemd.tmpfiles.rules = [ "d /var/lib/xkomhotshot 0700 xkomhotshot root - -" ];
   };
 }

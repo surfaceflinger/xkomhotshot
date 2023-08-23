@@ -1,38 +1,27 @@
 {
   description = "Flake with module and a package for running xkom hotshot bot";
 
-  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable-small";
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable-small";
+    flake-parts.url = "github:hercules-ci/flake-parts";
+  };
 
-  outputs = { self, nixpkgs }:
-    let
-      supportedSystems = [ "x86_64-linux" "i686-linux" "aarch64-linux" ];
-      forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
-      nixpkgsFor = forAllSystems (system: import nixpkgs { inherit system; overlays = [ self.overlays.default ]; });
-    in
-    {
-      overlays.default = final: prev: rec {
-        python3 = prev.python3.override {
-          packageOverrides = final: prev: {
-            xkomhotshot = final.callPackage ./nix/package.nix { };
-          };
-        };
-        python3Packages = python3.pkgs;
+  outputs = { flake-parts, ... } @ inputs:
+    flake-parts.lib.mkFlake { inherit inputs; } {
+      systems = [ "x86_64-linux" "aarch64-linux" "armv7l-linux" "riscv64-linux" ];
+
+      imports = [ flake-parts.flakeModules.easyOverlay ];
+
+      perSystem = { config, self', pkgs, ... }: {
+        packages.xkomhotshot = pkgs.python3.pkgs.callPackage ./nix/package.nix { };
+        packages.default = self'.packages.xkomhotshot;
+        checks = config.packages;
+
+        devShells.default = pkgs.mkShell { buildInputs = [ self'.packages.default ]; };
       };
 
-      packages = forAllSystems (system: {
-        inherit (nixpkgsFor.${system}.python3Packages) xkomhotshot;
-      });
-
-      checks = forAllSystems (system: {
-        build = self.packages.${system}.xkomhotshot;
-      });
-
-      nixosModules.default = import ./nix/service.nix { overlay = self.overlays.default; };
-
-      devShells = forAllSystems (system: {
-        default = nixpkgsFor.${system}.mkShell {
-          buildInputs = with nixpkgsFor.${system}.pkgs ; [ python3Packages.xkomhotshot ];
-        };
-      });
+      flake = {
+        nixosModules.default = import ./nix/service.nix inputs;
+      };
     };
 }
