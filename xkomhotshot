@@ -8,11 +8,11 @@ token = os.environ.get("TG_TOKEN")
 channel = os.environ.get("TG_CHANNEL")
 
 API_HEADERS = {
-    "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:82.0) Gecko/20100101 Firefox/82.0",
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36",
     "X-API-Key": "sJSgnQXySmp6pqNV",
 }
 
-API_URL = "https://mobileapi.x-kom.pl/api/v1/xkom/hotShots/current?onlyHeader=false"
+API_URL = "https://mobileapi-direct.x-kom.pl/api/v1/xkom/hotShots/current?onlyHeader=true"
 
 def get_hot_shot():
     response = requests.get(url=API_URL, headers=API_HEADERS).json()
@@ -21,7 +21,7 @@ def get_hot_shot():
         "price": response['Price'],
         "old_price": response['OldPrice'],
         "link": f"https://www.x-kom.pl/goracy_strzal/{response['Id']}",
-        "photo_url": response['Product']['MainPhoto']['Url'],
+        "photo_url": response['PromotionPhoto']['Url'],
     }
     return hot_shot_info
 
