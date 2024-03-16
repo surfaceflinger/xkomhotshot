@@ -1,5 +1,6 @@
 { lib
 , buildPythonPackage
+, pysocks
 , python-telegram-bot
 , requests
 }:
@@ -7,7 +8,7 @@ buildPythonPackage {
   name = "xkomhotshot";
   src = ../.;
 
-  propagatedBuildInputs = [ python-telegram-bot requests ];
+  propagatedBuildInputs = [ pysocks python-telegram-bot requests ];
 
   meta = with lib; {
     description = "Receive notifications on Telegram about new promotions on x-kom.pl";
