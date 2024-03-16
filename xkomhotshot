@@ -9,10 +9,10 @@ channel = os.environ.get("TG_CHANNEL")
 
 API_HEADERS = {
     "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36",
-    "X-API-Key": "sJSgnQXySmp6pqNV",
+    "X-API-Key": "jfsTOgOL23CN2G8Y",
 }
 
-API_URL = "https://mobileapi-direct.x-kom.pl/api/v1/xkom/hotShots/current?onlyHeader=true"
+API_URL = "https://mobileapi.x-kom.pl/api/v1/xkom/hotShots/current?onlyHeader=true"
 
 def get_hot_shot():
     response = requests.get(url=API_URL, headers=API_HEADERS).json()
