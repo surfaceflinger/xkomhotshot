@@ -43,7 +43,7 @@ in
         RestrictRealtime = true;
         DynamicUser = true;
         EnvironmentFile = cfg.environmentFile;
-        ExecStart = "${self.packages.${pkgs.system}.default}/bin/xkomhotshot";
+        ExecStart = lib.getExe self.packages.${pkgs.system}.default;
       };
     };
   };

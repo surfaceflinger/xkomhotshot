@@ -2,17 +2,18 @@
 , buildPythonPackage
 , pysocks
 , python-telegram-bot
-, requests
+, cloudscraper
 }:
 buildPythonPackage {
   name = "xkomhotshot";
   src = ../.;
 
-  propagatedBuildInputs = [ pysocks python-telegram-bot requests ];
+  propagatedBuildInputs = [ cloudscraper pysocks python-telegram-bot ];
 
   meta = with lib; {
+    changelog = "https://github.com/surfaceflinger/xkomhotshot/commits/master";
     description = "Receive notifications on Telegram about new promotions on x-kom.pl";
     homepage = "https://github.com/surfaceflinger/xkomhotshot";
-    changelog = "https://github.com/surfaceflinger/xkomhotshot/commits/master";
+    mainProgram = "xkomhotshot";
   };
 }

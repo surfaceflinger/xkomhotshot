@@ -1,20 +1,20 @@
 #!/usr/bin/env python3
 from telegram import Bot
 import asyncio
+import cloudscraper
 import os
-import requests
 
 token = os.environ.get("TG_TOKEN")
 channel = os.environ.get("TG_CHANNEL")
 
 API_HEADERS = {
-    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36",
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0",
     "X-API-Key": "jfsTOgOL23CN2G8Y",
 }
-
 API_URL = "https://mobileapi.x-kom.pl/api/v1/xkom/hotShots/current?onlyHeader=true"
 
 def get_hot_shot():
+    requests = cloudscraper.create_scraper()
     response = requests.get(url=API_URL, headers=API_HEADERS).json()
     hot_shot_info = {
         "name": response['PromotionName'],
