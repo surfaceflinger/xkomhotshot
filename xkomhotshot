@@ -17,11 +17,13 @@ def get_hot_shot():
     requests = cloudscraper.create_scraper()
     response = requests.get(url=API_URL, headers=API_HEADERS).json()
     hot_shot_info = {
-        "name": response['PromotionName'],
-        "price": response['Price'],
-        "old_price": response['OldPrice'],
         "link": f"https://www.x-kom.pl/goracy_strzal/{response['Id']}",
+        "name": response['PromotionName'],
         "photo_url": response['PromotionPhoto']['Url'],
+        "price_min_date": response['MinPriceInfo']['DateMinPrice'][:10],
+        "price_min": response['MinPriceInfo']['MinPrice'],
+        "price_promo": response['Price'],
+        "price_regular": response['OldPrice'],
     }
     return hot_shot_info
 
@@ -30,8 +32,9 @@ async def main():
     hot_shot_data = get_hot_shot()
     description = (
         f"Item: {hot_shot_data['name']}\n"
-        f"Cena: {hot_shot_data['price']} PLN\n"
-        f"Stara cena: {hot_shot_data['old_price']} PLN\n"
+        f"Cena promocyjna: {hot_shot_data['price_promo']} PLN\n"
+        f"Cena regularna: {hot_shot_data['price_regular']} PLN\n"
+        f"Cena najniższa z ostatnich 30 dni: {hot_shot_data['price_min']} PLN / {hot_shot_data['price_min_date']}\n"
         f"Link: {hot_shot_data['link']}"
     )
     try:
