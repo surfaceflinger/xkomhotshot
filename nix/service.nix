@@ -1,8 +1,9 @@
 { self, ... }:
-{ config
-, lib
-, pkgs
-, ...
+{
+  config,
+  lib,
+  pkgs,
+  ...
 }:
 
 with lib;
@@ -28,7 +29,10 @@ in
     systemd.timers.xkomhotshot = {
       wantedBy = [ "timers.target" ];
       partOf = [ "xkomhotshot.service" ];
-      timerConfig.OnCalendar = [ "*-*-* 10:00:05 Europe/Warsaw" "*-*-* 22:00:05 Europe/Warsaw" ];
+      timerConfig.OnCalendar = [
+        "*-*-* 10:00:05 Europe/Warsaw"
+        "*-*-* 22:00:05 Europe/Warsaw"
+      ];
     };
 
     systemd.services.xkomhotshot = {

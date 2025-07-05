@@ -1,14 +1,23 @@
-{ lib
-, buildPythonPackage
-, pysocks
-, python-telegram-bot
-, cloudscraper
+{
+  buildPythonPackage,
+  cloudscraper,
+  lib,
+  pysocks,
+  python-telegram-bot,
+  setuptools,
 }:
 buildPythonPackage {
   name = "xkomhotshot";
   src = ../.;
 
-  propagatedBuildInputs = [ cloudscraper pysocks python-telegram-bot ];
+  pyproject = true;
+  build-system = [ setuptools ];
+
+  propagatedBuildInputs = [
+    cloudscraper
+    pysocks
+    python-telegram-bot
+  ];
 
   meta = with lib; {
     changelog = "https://github.com/surfaceflinger/xkomhotshot/commits/master";
