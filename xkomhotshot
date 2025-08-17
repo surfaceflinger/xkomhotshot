@@ -26,6 +26,7 @@ def get_hot_shot():
         "price_min": response["MinPriceInfo"]["MinPrice"],
         "price_promo": response["Price"],
         "price_regular": response["OldPrice"],
+        "item_count": response["PromotionTotalCount"],
     }
     return hot_shot_info
 
@@ -38,6 +39,7 @@ async def main():
         f"Cena promocyjna: {hot_shot_data['price_promo']} PLN\n"
         f"Cena regularna: {hot_shot_data['price_regular']} PLN\n"
         f"Cena najniższa z ostatnich 30 dni: {hot_shot_data['price_min']} PLN / {hot_shot_data['price_min_date']}\n"
+        f"Ilość sztuk: {hot_shot_data['item_count']}\n"
         f"Link: {hot_shot_data['link']}"
     )
     try:
