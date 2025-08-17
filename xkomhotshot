@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-from telegram import Bot
 import asyncio
-import cloudscraper
 import os
+
+import cloudscraper
+from telegram import Bot
 
 token = os.environ.get("TG_TOKEN")
 channel = os.environ.get("TG_CHANNEL")
@@ -13,20 +14,21 @@ API_HEADERS = {
 }
 API_URL = "https://mobileapi.x-kom.pl/api/v1/xkom/hotShots/current?onlyHeader=true"
 
+
 def get_hot_shot():
     requests = cloudscraper.create_scraper()
     response = requests.get(url=API_URL, headers=API_HEADERS).json()
     hot_shot_info = {
         "link": f"https://www.x-kom.pl/goracy_strzal/{response['Id']}",
-        "name": response['PromotionName'],
-        "photo_url": response['PromotionPhoto']['Url'],
-        "price_min_date": response['MinPriceInfo']['DateMinPrice'][:10],
-        "price_min": response['MinPriceInfo']['MinPrice'],
-        "price_promo": response['Price'],
-        "price_regular": response['OldPrice'],
-        "item_count": response["PromotionTotalCount"],
+        "name": response["PromotionName"],
+        "photo_url": response["PromotionPhoto"]["Url"],
+        "price_min_date": response["MinPriceInfo"]["DateMinPrice"][:10],
+        "price_min": response["MinPriceInfo"]["MinPrice"],
+        "price_promo": response["Price"],
+        "price_regular": response["OldPrice"],
     }
     return hot_shot_info
+
 
 async def main():
     bot = Bot(token)
@@ -36,13 +38,15 @@ async def main():
         f"Cena promocyjna: {hot_shot_data['price_promo']} PLN\n"
         f"Cena regularna: {hot_shot_data['price_regular']} PLN\n"
         f"Cena najniższa z ostatnich 30 dni: {hot_shot_data['price_min']} PLN / {hot_shot_data['price_min_date']}\n"
-        f"Ilość sztuk: {hot_shot_data["item_count"]}\n"
         f"Link: {hot_shot_data['link']}"
     )
     try:
-        await bot.send_photo(chat_id=channel, photo=hot_shot_data['photo_url'], caption=description)
-    except Exception as e:
+        await bot.send_photo(
+            chat_id=channel, photo=hot_shot_data["photo_url"], caption=description
+        )
+    except Exception:
         await bot.send_message(chat_id=channel, text=description)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     asyncio.run(main())
