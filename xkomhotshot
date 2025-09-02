@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import asyncio
 import os
+from html import escape
 
 import cloudscraper
 from telegram import Bot
@@ -19,7 +20,7 @@ def get_hot_shot():
     requests = cloudscraper.create_scraper()
     response = requests.get(url=API_URL, headers=API_HEADERS).json()
     hot_shot_info = {
-        "link": f"https://www.x-kom.pl/goracy_strzal/{response['Id']}",
+        "id": response["Id"],
         "name": response["PromotionName"],
         "photo_url": response["PromotionPhoto"]["Url"],
         "price_min_date": response["MinPriceInfo"]["DateMinPrice"][:10],
@@ -31,23 +32,41 @@ def get_hot_shot():
     return hot_shot_info
 
 
+def build_html_caption(data: dict) -> str:
+    name = escape(data["name"])
+    price_promo = data["price_promo"]
+    price_regular = data["price_regular"]
+    if price_regular:
+        discount = (price_regular - price_promo) / price_regular
+    else:
+        discount = 0
+    price_min = data["price_min"]
+    price_min_date = escape(data["price_min_date"])
+    promotion_id = escape(str(data["id"]))
+    link = f"https://www.x-kom.pl/goracy_strzal/{promotion_id}"
+    return (
+        f"<b>{name}</b>\n"
+        f"Cena promocyjna: <b>{price_promo} PLN (-{discount:.0%})</b>\n"
+        f"Cena regularna: <b>{price_regular} PLN</b>\n"
+        f"Cena najniższa z ostatnich 30 dni: <b>{price_min} PLN ({price_min_date})</b>\n"
+        f"Ilość sztuk: <b>{data['item_count']}</b>\n"
+        f"Link: {link}"
+    )
+
+
 async def main():
     bot = Bot(token)
     hot_shot_data = get_hot_shot()
-    description = (
-        f"Item: {hot_shot_data['name']}\n"
-        f"Cena promocyjna: {hot_shot_data['price_promo']} PLN\n"
-        f"Cena regularna: {hot_shot_data['price_regular']} PLN\n"
-        f"Cena najniższa z ostatnich 30 dni: {hot_shot_data['price_min']} PLN / {hot_shot_data['price_min_date']}\n"
-        f"Ilość sztuk: {hot_shot_data['item_count']}\n"
-        f"Link: {hot_shot_data['link']}"
-    )
+    caption = build_html_caption(hot_shot_data)
     try:
         await bot.send_photo(
-            chat_id=channel, photo=hot_shot_data["photo_url"], caption=description
+            chat_id=channel,
+            photo=hot_shot_data["photo_url"],
+            caption=caption,
+            parse_mode="HTML",
         )
     except Exception:
-        await bot.send_message(chat_id=channel, text=description)
+        await bot.send_message(chat_id=channel, text=caption, parse_mode="HTML")
 
 
 if __name__ == "__main__":
