@@ -47,7 +47,7 @@ in
         RestrictRealtime = true;
         DynamicUser = true;
         EnvironmentFile = cfg.environmentFile;
-        ExecStart = lib.getExe self.packages.${pkgs.system}.default;
+        ExecStart = lib.getExe self.packages.${pkgs.stdenv.hostPlatform.system}.default;
       };
     };
   };
